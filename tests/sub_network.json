@@ -1,0 +1,70 @@
+{
+  "properties": {
+    "name": "Split input and count"
+  },
+  "processes": {
+    "Split": {
+      "component": "string.split",
+      "metadata": {
+        "x": 250,
+        "y": 10
+      }
+    },
+    "Count": {
+      "component": "core.count",
+      "metadata": {
+        "x": 250,
+        "y": 120
+      }
+    }
+  },
+  "inports": {
+    "in": {},
+    "separator": {}
+  },
+  "outports": {
+    "out": {}
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "Split",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Count",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "external",
+        "port": "in"
+      },
+      "tgt": {
+        "process": "Split",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "external",
+        "port": "separator"
+      },
+      "tgt": {
+        "process": "Split",
+        "port": "separator"
+      }
+    },
+    {
+      "src": {
+        "process": "Count",
+        "port": "sum"
+      },
+      "tgt": {
+        "process": "external",
+        "port": "out"
+      }
+    }
+  ]
+}

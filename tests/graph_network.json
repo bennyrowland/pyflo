@@ -1,0 +1,65 @@
+{
+  "properties": {
+    "name": "Count lines in a file"
+  },
+  "processes": {
+    "Read File": {
+      "component": "core.readfile",
+      "metadata": {
+        "x": 10,
+        "y": 100
+      }
+    },
+    "Graph": {
+      "component": "core.graph",
+      "metadata": {
+        "graph": "tests/sub_network.json",
+        "x": 250,
+        "y": 10
+      }
+    },
+    "Log": {
+      "component": "core.log",
+      "metadata": {
+        "x": 250,
+        "y": 120
+      }
+    }
+  },
+  "connections": [
+    {
+      "data": "package.json",
+      "tgt": {
+        "process": "Read File",
+        "port": "source"
+      }
+    },
+    {
+      "src": {
+        "process": "Read File",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Graph",
+        "port": "in"
+      }
+    },
+    {
+      "src": {
+        "process": "Graph",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Log",
+        "port": "in"
+      }
+    },
+    {
+      "data": "\n",
+      "tgt": {
+        "process": "Graph",
+        "port": "separator"
+      }
+    }
+  ]
+}
