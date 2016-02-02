@@ -17,7 +17,7 @@ def run_graph():
         loader_config = json.loads(file_args.loaders)
         pyflo.graph.configure_graph_loaders(loader_config)
     if file_args.graph:
-        print("running pyflo graph in file {}".format(file_args.graph))
+        print("running pyflo graph in file {}".format(file_args.graph), flush=True)
         try:
             #with open(file_args.graph, 'rt') as fin:
             #    graph_spec = json.load(fin)
@@ -52,3 +52,52 @@ def run_graph():
     pyflo.graph.run_graph(graph_spec, inport_args)
 
     exit(0)
+
+
+def export_components():
+    """
+    Sends to stdout a JSON object describing the installed pyflo components
+    :return:
+    """
+    from stevedore import extension
+
+    mgr = extension.ExtensionManager(
+        namespace="pyflo",
+        invoke_on_load=False
+    )
+
+    extension_list = mgr.names()
+    # have to remove the graph component which is special
+    extension_list.remove("pyflo.core.graph")
+
+    def process(name, component, folder):
+        if "." in name:
+            sub_folder, rest = name.split(".", 1)
+            if sub_folder not in folder["folders"]:
+                folder["folders"][sub_folder] = {"components": {}, "folders": {}}
+            process(rest, component, folder["folders"][sub_folder])
+        else:
+
+            folder["components"][name] = component
+
+    #
+    component_library = {"folders": {}, "components": {}}
+    for component_name in extension_list:
+        component_dict = {"inports": [], "outports": []}
+
+        # we need to make an instance of the plugin so we can find out about it
+        instance = mgr[component_name].plugin({})
+
+        # get a list of the inports, outports and their config
+        for inport_name, inport in instance.inports.items():
+            component_dict["inports"].append(dict({"name": inport_name}, **inport.config))
+        for outport_name, outport in instance.outports.items():
+            component_dict["outports"].append(dict({"name": outport_name}, **outport.config))
+
+        # remove the first component (always "pyflo" to remove the top level of the hierarchy
+        pyflo_string, component_name = component_name.split(".", 1)
+        process(component_name, component_dict, component_library)
+
+    #print(component_library)
+    import json
+    print(json.dumps(component_library))

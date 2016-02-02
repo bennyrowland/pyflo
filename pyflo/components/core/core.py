@@ -23,7 +23,9 @@ class CountingComponent(pyflo.component.Component):
         self.count += 1
 
     def end_group(self):
-        self.outports["sum"].send_data("Counted {} components".format(self.count))
+        import time
+        #time.sleep(4)
+        self.outports["sum"].send_data(self.count)
 
 
 class GraphComponent(pyflo.component.Component):

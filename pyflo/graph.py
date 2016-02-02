@@ -12,17 +12,13 @@ loader_manager = extension.ExtensionManager(
 )
 loader_list = []
 
-import pkg_resources
-for ep in pkg_resources.iter_entry_points("loaders"):
-    print(ep)
-
 mgr = extension.ExtensionManager(
     namespace="pyflo",
     invoke_on_load=False
 )
 
-print(mgr.names())
-print(loader_manager.names())
+#print(mgr.names(), flush=True)
+#print(loader_manager.names(), flush=True)
 
 
 def run_graph(graph_spec, inport_args):
@@ -33,6 +29,7 @@ def run_graph(graph_spec, inport_args):
 class Graph:
     def __init__(self, specification):
         self.processes = {}
+        self.data_connections = []
         for process_id, config in specification["processes"].items():
             component_name = "pyflo." + config["component"]
             if component_name in mgr:
@@ -65,9 +62,11 @@ class Graph:
                 start_port.connect(target_component.inports[connection_data["tgt"]["port"]])
             else:
                 target_component.inports[connection_data["tgt"]["port"]].on_connect("data")
-                target_component.inports[connection_data["tgt"]["port"]].data(connection_data["data"])
+                self.data_connections.append((target_component.inports[connection_data["tgt"]["port"]], connection_data["data"]))
+                #target_component.inports[connection_data["tgt"]["port"]].data(connection_data["data"])
 
     def run(self, inport_args=MappingProxyType({})):
+        #print(inport_args, flush=True)
         # first we have to loop over all the inport args to actually connect them to the true inports
         # we only do this for the ones supplied here so they aren't connected by default
         for arg, value in inport_args.items():
@@ -79,10 +78,12 @@ class Graph:
                 self.processes["inports"].outports[arg].data(value)
         for process in self.processes.values():
             process.graph_loaded()
+        for data_connection in self.data_connections:
+            data_connection[0].data(data_connection[1])
 
 
 def configure_graph_loaders(config):
-    print("configuring graph_loaders {}".format(config))
+    #print("configuring graph_loaders {}".format(config), flush=True)
     for loader_name, loader_config in config.items():
         if loader_name in loader_manager:
             loader_list.append(loader_manager[loader_name].plugin(loader_config))

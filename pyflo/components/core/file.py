@@ -29,4 +29,4 @@ class ConsoleLoggerComponent(pyflo.component.Component):
             "in": {},
         }
         super().__init__(inports, {})
-        self.inports["in"].on("data", print)
+        self.inports["in"].on("data", lambda x: print("{}".format(x), flush=True))

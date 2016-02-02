@@ -12,6 +12,7 @@ setup(
         entry_points={
             "pyflo": [
                 "pyflo.string.split = pyflo.components.string.string:SplitComponent",
+                "pyflo.string.format = pyflo.components.string.string:FormatComponent",
                 "pyflo.core.readfile = pyflo.components.core:FileReadComponent",
                 "pyflo.core.log = pyflo.components.core:ConsoleLoggerComponent",
                 "pyflo.core.count = pyflo.components.core:CountingComponent",
@@ -22,6 +23,7 @@ setup(
             ],
             "console_scripts": [
                 "pyflo = pyflo.main:run_graph",
+                "pyflo-library = pyflo.main:export_components"
             ]
         },
         install_requires=["stevedore", 'pycouchdb']
