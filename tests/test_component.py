@@ -1,4 +1,3 @@
-from nose.tools import *
 import pyflo
 import sys
 import json

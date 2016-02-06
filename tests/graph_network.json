@@ -28,7 +28,7 @@
   },
   "connections": [
     {
-      "data": "package.json",
+      "data": "LICENSE",
       "tgt": {
         "process": "Read File",
         "port": "source"

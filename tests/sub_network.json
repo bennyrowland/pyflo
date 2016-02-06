@@ -18,13 +18,13 @@
       }
     }
   },
-  "inports": {
-    "in": {},
-    "separator": {}
-  },
-  "outports": {
-    "out": {}
-  },
+  "inports": [
+    {"name": "in"},
+    {"name": "separator"}
+  ],
+  "outports": [
+    {"name": "out"}
+  ],
   "connections": [
     {
       "src": {
@@ -38,7 +38,7 @@
     },
     {
       "src": {
-        "process": "external",
+        "process": "inports",
         "port": "in"
       },
       "tgt": {
@@ -48,7 +48,7 @@
     },
     {
       "src": {
-        "process": "external",
+        "process": "inports",
         "port": "separator"
       },
       "tgt": {
@@ -62,7 +62,7 @@
         "port": "sum"
       },
       "tgt": {
-        "process": "external",
+        "process": "outports",
         "port": "out"
       }
     }
