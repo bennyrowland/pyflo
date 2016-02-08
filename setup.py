@@ -26,5 +26,5 @@ setup(
                 "pyflo-library = pyflo.main:export_components"
             ]
         },
-        install_requires=["stevedore", 'pycouchdb']
+        install_requires=["stevedore", 'pycouchdb', 'pytest']
 )

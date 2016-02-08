@@ -1,6 +1,6 @@
 import pyflo
-import sys
 import json
+from unittest.mock import patch
 
 
 class InputComponent(pyflo.component.Component):
@@ -51,20 +51,8 @@ class LoggingComponent(pyflo.component.Component):
         print(data)
 
 
-def setup():
-    print("SETUP!")
-
-
-def teardown():
-    print("TEAR DOWN!")
-
-
-def test_basic():
-    print("I RAN!")
-
-
-def test_simple():
-    print("Constructing simple network")
+@patch.object(LoggingComponent, 'log')
+def test_simple(mock_method):
     start = InputComponent()
     split = pyflo.components.string.SplitComponent(None)
     count = CountingComponent()
@@ -72,16 +60,15 @@ def test_simple():
     start.outports["out"].connect(split.inports["in"])
     split.outports["out"].connect(count.inports["in"])
     count.outports["out"].connect(end.inports["in"])
-    print("Network constructed")
     start.graph_loaded()
-    print("Network finished")
+    mock_method.assert_called_once_with("Counted 6 components")
 
 
 def test_graph_in_graph():
-    with open("tests/graph_network.json", 'rt') as fin:
+    with open("pyflo/tests/graph_network.json", 'rt') as fin:
         graph_spec = json.load(fin)
     graph = pyflo.graph.Graph(graph_spec)
     graph.run()
 
-if __name__ == "__main__":
-    test_graph_in_graph()
+#if __name__ == "__main__":
+    #test_graph_in_graph()

@@ -27,9 +27,10 @@ class Inport(Port):
         :param function: The function to call when the event occurs
         :return:
         """
-        def _on(func):
-            if event_name not in self._events:
+        if event_name not in self._events:
                 raise KeyError("Inport does not accept {} events".format(event_name))
+
+        def _on(func):
             if func not in self._events[event_name]:
                 self._events[event_name].append(func)
             return func

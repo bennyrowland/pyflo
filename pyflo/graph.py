@@ -17,9 +17,6 @@ mgr = extension.ExtensionManager(
     invoke_on_load=False
 )
 
-#print(mgr.names(), flush=True)
-#print(loader_manager.names(), flush=True)
-
 
 def run_graph(graph_spec, inport_args):
     graph = Graph(graph_spec)
@@ -72,18 +69,20 @@ class Graph:
         for arg, value in inport_args.items():
             if arg in self.processes["inports"].outports and value is not None:
                 self.processes["inports"].outports[arg].make_connections()
+
+        for process in self.processes.values():
+            process.graph_loaded()
+
         # now all the ports know whether they are connected or not, we can send the actual data in
         for arg, value in inport_args.items():
             if arg in self.processes["inports"].outports and value is not None:
                 self.processes["inports"].outports[arg].data(value)
-        for process in self.processes.values():
-            process.graph_loaded()
+
         for data_connection in self.data_connections:
             data_connection[0].data(data_connection[1])
 
 
 def configure_graph_loaders(config):
-    #print("configuring graph_loaders {}".format(config), flush=True)
     for loader_name, loader_config in config.items():
         if loader_name in loader_manager:
             loader_list.append(loader_manager[loader_name].plugin(loader_config))

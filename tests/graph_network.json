@@ -13,7 +13,7 @@
     "Graph": {
       "component": "core.graph",
       "metadata": {
-        "graph": "tests/sub_network.json",
+        "graph": "pyflo/tests/sub_network.json",
         "x": 250,
         "y": 10
       }
@@ -28,7 +28,7 @@
   },
   "connections": [
     {
-      "data": "LICENSE",
+      "data": "pyflo/LICENSE",
       "tgt": {
         "process": "Read File",
         "port": "source"

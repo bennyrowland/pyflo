@@ -70,34 +70,50 @@ def export_components():
     # have to remove the graph component which is special
     extension_list.remove("pyflo.core.graph")
 
+    #def process(name, component, folder):
+    #    if "." in name:
+    #        sub_folder, rest = name.split(".", 1)
+    #        if sub_folder not in folder["folders"]:
+    #            folder["folders"][sub_folder] = {"components": {}, "folders": {}}
+    #        process(rest, component, folder["folders"][sub_folder])
+    #    else:
+    #        folder["components"][name] = component
+
     def process(name, component, folder):
         if "." in name:
-            sub_folder, rest = name.split(".", 1)
-            if sub_folder not in folder["folders"]:
-                folder["folders"][sub_folder] = {"components": {}, "folders": {}}
-            process(rest, component, folder["folders"][sub_folder])
+            subfolder_name, rest = name.split(".", 1)
+            for child_folder in folder["children"]:
+                if child_folder["name"] == subfolder_name:
+                    process(rest, component, child_folder)
+                    break
+            else:
+                new_folder = {"name": subfolder_name, "children": []}
+                folder["children"].append(new_folder)
+                process(rest, component, new_folder)
         else:
+            folder["children"].append(dict({"name": name, "children": []}, **component))
 
-            folder["components"][name] = component
 
     #
-    component_library = {"folders": {}, "components": {}}
+    component_library = {"children": []}
     for component_name in extension_list:
-        component_dict = {"inports": [], "outports": []}
-
         # we need to make an instance of the plugin so we can find out about it
         instance = mgr[component_name].plugin({})
 
-        # get a list of the inports, outports and their config
-        for inport_name, inport in instance.inports.items():
-            component_dict["inports"].append(dict({"name": inport_name}, **inport.config))
-        for outport_name, outport in instance.outports.items():
-            component_dict["outports"].append(dict({"name": outport_name}, **outport.config))
-
         # remove the first component (always "pyflo" to remove the top level of the hierarchy
         pyflo_string, component_name = component_name.split(".", 1)
+        component_dict = {"id": component_name, "config": {"inports": [], "outports": []}}
+
+        # get a list of the inports, outports and their config
+        for inport_name, inport in instance.inports.items():
+            component_dict["config"]["inports"].append(dict({"name": inport_name}, **inport.config))
+        for outport_name, outport in instance.outports.items():
+            component_dict["config"]["outports"].append(dict({"name": outport_name}, **outport.config))
+
         process(component_name, component_dict, component_library)
 
     #print(component_library)
+
+    #print(component_library)
     import json
-    print(json.dumps(component_library))
+    print(json.dumps(component_library, indent=4))
