@@ -67,6 +67,7 @@ def export_components():
     )
 
     extension_list = mgr.names()
+
     # have to remove the graph component which is special
     extension_list.remove("pyflo.core.graph")
 
